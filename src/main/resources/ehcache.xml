@@ -1,0 +1,4 @@
+<ehcache>
+    <cache name="motorcycles" maxElementsInMemory="1000"/>
+    <cache name="suzukis" maxElementsInMemory="1000"/>
+</ehcache>

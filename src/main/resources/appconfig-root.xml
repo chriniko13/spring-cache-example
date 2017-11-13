@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:hz="http://www.hazelcast.com/schema/spring" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/cache
+       http://www.springframework.org/schema/cache/spring-cache.xsd
+       http://www.hazelcast.com/schema/spring
+       http://www.hazelcast.com/schema/spring/hazelcast-spring.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <!-- Start: Bean Declaration here -->
+
+    <context:component-scan base-package="spring.cache.example"/>
+
+    <bean id="motorcycleSearchService" class="spring.cache.example.service.MotorcycleSearchService" init-method="init">
+    </bean>
+
+    <!-- End: Bean Declaration here -->
+
+
+    <!-- Start: Cache configuration -->
+
+    <!-- This configuration enables the use of the @Cacheable, @CacheEvict, @CachePut, -->
+    <!-- and @Caching annotations. -->
+    <cache:annotation-driven cache-manager="myCacheManager"/>
+
+    <!-- cache manager: first way (SimpleCacheManager) -->
+    <!--<bean id="myCacheManager" class="org.springframework.cache.support.SimpleCacheManager">-->
+        <!--<property name="caches">-->
+            <!--<set>-->
+                <!--<bean id="motorcycles"-->
+                      <!--class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"/>-->
+
+                <!--<bean id="suzukis"-->
+                      <!--class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"/>-->
+            <!--</set>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <!-- cache manager: second way (ConcurrentMapCacheManager) -->
+    <!--<bean id="myCacheManager" class="org.springframework.cache.concurrent.ConcurrentMapCacheManager"/>-->
+
+
+    <!-- cache manager: third way (NoOpCacheManager) -->
+    <!--<bean id="myCacheManager" class="org.springframework.cache.support.NoOpCacheManager"/>-->
+
+    <!-- cache manager: fourth way (CompositeCacheManager) -->
+    <bean id="myCacheManager" class="org.springframework.cache.support.CompositeCacheManager">
+
+        <property name="cacheManagers">
+
+            <list value-type="org.springframework.cache.CacheManager">
+
+                <!-- Spring -->
+                <bean class="org.springframework.cache.support.SimpleCacheManager">
+                    <property name="caches">
+                        <set>
+                            <bean id="motorcycles" class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"/>
+                            <bean id="suzukis" class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"/>
+                        </set>
+                    </property>
+                </bean>
+
+                <!-- Guava -->
+                <bean class="org.springframework.cache.guava.GuavaCacheManager">
+                    <property name="cacheNames">
+                        <list>
+                            <value>motorcycles</value>
+                            <value>suzukis</value>
+                        </list>
+                    </property>
+                </bean>
+
+                <!-- Hazelcast -->
+                <bean id="myCacheManager" class="com.hazelcast.spring.cache.HazelcastCacheManager">
+                    <constructor-arg name="hazelcastInstance">
+                        <hz:hazelcast id="hazelcast">
+                            <hz:config>
+                                <hz:map name="motorcycles">
+                                    <hz:map-store enabled="true"
+                                                  class-name="spring.cache.example.domain.Motorcycle"
+                                                  write-delay-seconds="0"/>
+                                </hz:map>
+
+                                <hz:map name="suzukis">
+                                    <hz:map-store enabled="true"
+                                                  class-name="spring.cache.example.domain.Motorcycle"
+                                                  write-delay-seconds="0"/>
+
+                                </hz:map>
+                                <hz:map name="foos">
+                                    <hz:map-store enabled="true"
+                                                  class-name="spring.cache.example.domain.Foo"
+                                                  write-delay-seconds="0"/>
+                                </hz:map>
+                            </hz:config>
+                        </hz:hazelcast>
+                    </constructor-arg>
+                </bean>
+
+
+                <!-- Ehcache -->
+                <bean class="org.springframework.cache.ehcache.EhCacheCacheManager">
+                    <property name="cacheManager">
+                        <bean class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+                            <property name="configLocation" value="classpath:ehcache.xml"/>
+                        </bean>
+                    </property>
+                </bean>
+
+            </list>
+
+        </property>
+
+    </bean>
+
+    <!-- End: Cache configuration -->
+
+
+</beans>
