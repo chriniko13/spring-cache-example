@@ -30,24 +30,7 @@ public class Client {
 
         fifthExample(motorcycleSearchService);
 
-
-        //6th example...
-        System.out.println("------- 6th example ---------");
-
-        Foo foo = fooSearchService.get("1");
-        System.out.println("result = " + foo);
-
-        System.out.println("\n");
-
-        foo = fooSearchService.get("niko");
-        System.out.println("result = " + foo);
-
-        System.out.println("\n");
-
-        foo = fooSearchService.get("niko");
-        System.out.println("result = " + foo);
-
-        System.out.println("\n");
+        sixthExample(fooSearchService);
 
     }
 
@@ -163,4 +146,23 @@ public class Client {
         System.out.println("\n");
     }
 
+    private static void sixthExample(FooSearchService fooSearchService) {
+        //6th example...
+        System.out.println("------- 6th example ---------");
+
+        Foo foo = fooSearchService.get("1");
+        System.out.println("result = " + foo);
+
+        System.out.println("\n");
+
+        foo = fooSearchService.get("niko");
+        System.out.println("result = " + foo);
+
+        System.out.println("\n");
+
+        foo = fooSearchService.get("niko");
+        System.out.println("result = " + foo);
+
+        System.out.println("\n");
+    }
 }
